@@ -31,7 +31,7 @@ CREATE TABLE `businesses` (
   `notes` varchar(255) DEFAULT NULL,
   `latitude` int(11) DEFAULT NULL,
   `longitude` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `businesses`
@@ -147,6 +147,23 @@ ALTER TABLE `businesses`
 
 
   -- --------------------------------------------------------
+  -- phpMyAdmin SQL Dump
+  -- version 4.4.10
+  -- http://www.phpmyadmin.net
+  --
+  -- Host: localhost:8889
+  -- Generation Time: Jan 28, 2016 at 06:38 AM
+  -- Server version: 5.5.42
+  -- PHP Version: 5.6.10
+
+  SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+  SET time_zone = "+00:00";
+
+  --
+  -- Database: `sustain`
+  --
+
+  -- --------------------------------------------------------
 
   --
   -- Table structure for table `Categories`
@@ -154,8 +171,8 @@ ALTER TABLE `businesses`
 
   CREATE TABLE `Categories` (
     `id` int(11) NOT NULL,
-    `name` varchar(255) NOT NULL
-  ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+    `name` varchar(255) CHARACTER SET utf8 NOT NULL
+  ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 
   --
   -- Dumping data for table `Categories`
@@ -198,3 +215,220 @@ ALTER TABLE `businesses`
   --
   ALTER TABLE `Categories`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=17;
+
+
+
+
+
+
+
+
+
+
+
+
+
+  INSERT INTO
+    `sustain`.`items` (`id`, `name`)
+  VALUES
+  (NULL, 'Arts and crafts'),
+(NULL,'Barbeque grills'),
+(NULL,'Books'),
+(NULL,'Canning jars'),
+(NULL,'Cleaning supplies'),
+(NULL,'Clothes hangers'),
+(NULL,'Cookware'),
+(NULL,'Cookware'),
+(NULL,'Dishes'),
+(NULL,'Fabric'),
+(NULL,'Food storage containers'),
+(NULL,'Furniture'),
+(NULL,'Luggage'),
+(NULL,'Mattresses'),
+(NULL,'Ornaments'),
+(NULL,'Toiletries'),
+(NULL,'Utensils'),
+
+(NULL,'Blankets'),
+(NULL,'Comforters'),
+(NULL,'Linens'),
+(NULL,'Sheets'),
+(NULL,'Small rugs'),
+(NULL,'Towels '),
+
+(NULL,'Arts and crafts '),
+(NULL,'Baby carriers'),
+(NULL,'Baby gates'),
+(NULL,'Bike trailers'),
+(NULL,'Books'),
+(NULL,'Child car seats'),
+(NULL,'Clothes'),
+(NULL,'Crayons'),
+(NULL,'Cribs'),
+(NULL,'Diapers '),
+(NULL,'High chairs'),
+(NULL,'Maternity'),
+(NULL,'Musical instruments'),
+(NULL,'Nursing items'),
+(NULL,'Playpens'),
+(NULL,'School supplies'),
+(NULL,'Strollers'),
+(NULL,'Toys'),
+
+(NULL,'Blenders'),
+(NULL,'Dehumidifiers'),
+(NULL,'Fans'),
+(NULL,'Microwaves'),
+(NULL,'Space heaters'),
+(NULL,'Toasters'),
+(NULL,'Vacuum cleaners'),
+
+(NULL,'Dishwashers'),
+(NULL,'Freezers'),
+(NULL,'Refrigerators'),
+(NULL,'Stoves'),
+(NULL,'Washers/ dryers'),
+
+(NULL,'Bricks'),
+(NULL,'Carpet padding'),
+(NULL,'Carpets'),
+(NULL,'Ceramic tiles'),
+(NULL,'Doors'),
+(NULL,'Drywall'),
+(NULL,'Electrical supplies'),
+(NULL,'Hand tools'),
+(NULL,'Hardware'),
+(NULL,'Insulation'),
+(NULL,'Ladders'),
+(NULL,'Light fixtures'),
+(NULL,'Lighting ballasts'),
+(NULL,'Lumber'),
+(NULL,'Motors'),
+(NULL,'Paint'),
+(NULL,'Pipe'),
+(NULL,'Plumbing'),
+(NULL,'Power tools'),
+(NULL,'Reusable metal items'),
+(NULL,'Roofing '),
+(NULL,'Vinyl'),
+(NULL,'Windows'),
+
+(NULL,'Belts'),
+(NULL,'Boots'),
+(NULL,'Clothes'),
+(NULL,'Coats'),
+(NULL,'Hats'),
+(NULL,'Rainwear'),
+(NULL,'Sandals'),
+(NULL,'Shoes'),
+
+
+(NULL,'Calculators'),
+(NULL,'Cameras'),
+(NULL,'Cassette players'),
+(NULL,'Cd players'),
+(NULL,'Cds'),
+(NULL,'Cell phones'),
+(NULL,'Computers '),
+(NULL,'Curling irons'),
+(NULL,'DVD players'),
+(NULL,'Game consoles'),
+(NULL,'GPS systems'),
+(NULL,'Hair dryers'),
+(NULL,'Monitors'),
+(NULL,'MP3 players'),
+(NULL,'Printers'),
+(NULL,'Projectors'),
+(NULL,'Receivers'),
+(NULL,'Scanners'),
+(NULL,'Speakers'),
+(NULL,'Tablets'),
+(NULL,'Telephones'),
+(NULL,'TVs'),
+
+(NULL,'Backpacks'),
+(NULL,'Balls'),
+(NULL,'Barbells'),
+(NULL,'Bicycles'),
+(NULL,'Bike tires '),
+(NULL,'Camping equipment'),
+(NULL,'Day packs'),
+(NULL,'Dumbbells'),
+(NULL,'Exercise equipment'),
+(NULL,'Golf clubs'),
+(NULL,'Helmets'),
+(NULL,'Hiking boots'),
+(NULL,'Skateboards'),
+(NULL,'Skis'),
+(NULL,'Small boats'),
+(NULL,'Snowshoes'),
+(NULL,'Sporting goods'),
+(NULL,'Tennis rackets'),
+(NULL,'Tents'),
+(NULL,'Chain saws'),
+(NULL,'Fencing'),
+(NULL,'Garden pots'),
+(NULL,'Garden tools'),
+(NULL,'Hand clippers'),
+(NULL,'Hoses'),
+(NULL,'Lawn furniture'),
+(NULL,'Livestock supplies'),
+(NULL,'Loppers'),
+(NULL,'Mowers'),
+(NULL,'Seeders'),
+(NULL,'Soil amendment'),
+(NULL,'Sprinklers'),
+(NULL,'Wheel barrows'),
+(NULL,'Beverages'),
+(NULL,'Surplus garden produce'),
+(NULL,'Unopened canned goods'),
+(NULL,'Unopened packaged food'),
+(NULL,'Adult diapers'),
+(NULL,'Blood pressure monitors'),
+(NULL,'Canes'),
+(NULL,'Crutches'),
+(NULL,'Eye glasses'),
+(NULL,'Glucose meters'),
+(NULL,'Hearing aids'),
+(NULL,'Hospital beds'),
+(NULL,'Reach extenders'),
+(NULL,'Shower chairs'),
+(NULL,'Walkers'),
+(NULL,'Wheelchairs'),
+(NULL,'Calculators'),
+(NULL,'Computers '),
+(NULL,'Fax machines'),
+(NULL,'Headsets'),
+(NULL,'Monitors'),
+(NULL,'Office furniture'),
+(NULL,'Paper shredders'),
+(NULL,'Printer cartridge refilling'),
+(NULL,'Printers'),
+(NULL,'Scanners'),
+(NULL,'Telephones'),
+(NULL,'Bubble wrap'),
+(NULL,'Clean foam peanuts'),
+(NULL,'Foam sheets'),
+(NULL,'Egg cartons'),
+(NULL,'Firewood'),
+(NULL,'Fabric'),
+(NULL,'Paper bags'),
+(NULL,'Pet supplies'),
+(NULL,'Shopping  bags'),
+(NULL,'Vehicles/ parts'),
+(NULL,'Computer paper'),
+(NULL,'Reusable metal items'),
+(NULL,' Cell phones'),
+(NULL,' small appliances'),
+(NULL,'Books'),
+(NULL,'Cell phones'),
+(NULL,'Clothes'),
+(NULL,'Computers'),
+(NULL,'Furniture'),
+(NULL,'Lamps'),
+(NULL,'Lawn power equipment'),
+(NULL,'Outdoor Gear'),
+(NULL,'Sandals'),
+(NULL,'Shoes, boots'),
+(NULL,'Upholstery, car'),
+(NULL,'Upholstery, Furniture');

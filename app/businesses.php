@@ -8,7 +8,7 @@ if ($mysqli->connect_errno) {
   echo "db connection ok <br>";
 }
 
-// Get the user's food items from the database
+// Get the businesses from the database
 $stmt = $mysqli->prepare(
   'SELECT* FROM businesses ORDER BY name ASC;'
 );
