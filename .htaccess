@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_URI} ^/subdirectoryname1/(.*)$ [OR]
+RewriteCond %{REQUEST_URI} ^/subdirectoryname2/(.*)$ [OR]
+RewriteRule ^.*$ - [L]
+</IfModule>
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /sustain/
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /sustain/index.php [L]
+</IfModule>
+
+# END WordPress
