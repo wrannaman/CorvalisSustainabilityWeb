@@ -144,3 +144,57 @@ ALTER TABLE `businesses`
 --
 ALTER TABLE `businesses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=87;
+
+
+  -- --------------------------------------------------------
+
+  --
+  -- Table structure for table `Categories`
+  --
+
+  CREATE TABLE `Categories` (
+    `id` int(11) NOT NULL,
+    `name` varchar(255) NOT NULL
+  ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+
+  --
+  -- Dumping data for table `Categories`
+  --
+
+  INSERT INTO `Categories` (`id`, `name`) VALUES
+  (1, 'Household'),
+  (2, 'Bedding / bath'),
+  (3, 'Children’s goods'),
+  (4, 'Appliances - small'),
+  (5, 'Appliances - large'),
+  (6, 'Building/ home improvement'),
+  (7, 'Wearable items'),
+  (8, 'Useable Electronics'),
+  (9, 'Sporting equipment/ camping'),
+  (10, 'Garden'),
+  (11, 'Food'),
+  (12, 'Medical supplies'),
+  (13, 'Office equipment'),
+  (14, 'Packing materials'),
+  (15, 'Miscellaneous'),
+  (16, 'Repair items');
+
+  --
+  -- Indexes for dumped tables
+  --
+
+  --
+  -- Indexes for table `Categories`
+  --
+  ALTER TABLE `Categories`
+    ADD PRIMARY KEY (`id`);
+
+  --
+  -- AUTO_INCREMENT for dumped tables
+  --
+
+  --
+  -- AUTO_INCREMENT for table `Categories`
+  --
+  ALTER TABLE `Categories`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=17;

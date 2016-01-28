@@ -108,11 +108,11 @@ $stmt->close();
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Latitude</label>
-            <input type="text" class="form-control" id="latitude" placeholder="Latitude">
+            <input type="number" class="form-control" id="latitude" placeholder="Latitude">
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Longitude</label>
-            <input type="text" class="form-control" id="longitude" placeholder="Longitude">
+            <input type="number" class="form-control" id="longitude" placeholder="Longitude">
           </div>
         </form>
 
@@ -137,8 +137,11 @@ $stmt->close();
 
 <script>
 /* Put data in modal */
+var editing;
 $('body').on('click', '.edit', function(e){
   console.log('clicked', $(e.target));
+  editing = e;
+
   var id        = $(e.target).parent().parent().find('.id').text();
   var name      = $(e.target).parent().parent().find('.name').text();
   var address   = $(e.target).parent().parent().find('.address').text();
@@ -162,52 +165,69 @@ $('body').on('click', '.edit', function(e){
   $('#latitude').val(latitude);
   $('#longitude').val(longitude);
 
-  console.log('name', name);
-  console.log('address', address);
-  console.log('city', city);
-  console.log('state', state);
-  console.log('phone', phone);
-  console.log('website', website);
-  console.log('notes', notes);
-  console.log('latitude', latitude);
-  console.log('longitude', longitude);
+  // console.log('name', name);
+  // console.log('address', address);
+  // console.log('city', city);
+  // console.log('state', state);
+  // console.log('phone', phone);
+  // console.log('website', website);
+  // console.log('notes', notes);
+  // console.log('latitude', latitude);
+  // console.log('longitude', longitude);
 
 });
 
 $('body').on('click', '#saveBussiness', function(e){
 
   var data = {
-    name      : $('#name').val(),
-    address   : $('#address').val(),
-    city      : $('#city').val(),
-    state     : $('#state').val(),
-    phone     : $('#phone').val(),
-    website   : $('#website').val(),
-    notes     : $('#notes').val(),
-    latitude  : $('#latitude').val(),
-    longitude : $('#longitude').val()
+    id        : $('#id').val().trim(),
+    name      : $('#name').val().trim(),
+    address   : $('#address').val().trim(),
+    city      : $('#city').val().trim(),
+    state     : $('#state').val().trim(),
+    phone     : $('#phone').val().trim(),
+    website   : $('#website').val().trim(),
+    notes     : $('#notes').val().trim(),
+    latitude  : $('#latitude').val().trim() ? Number($('#latitude').val().trim()) : -1,
+    longitude : $('#longitude').val().trim() ? Number($('#longitude').val().trim()) : -1,
   }
 
-  console.log('* * Form Submission * *');
-  console.log('data', data);
+  //console.log('* * Form Submission * *');
+  //console.log('data', data);
 
   /* Post to /forms/businesses to save */
   // Submit #add-item-form using AJAX
   var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
-  console.log('base ', baseUrl);
+  //console.log('base ', baseUrl);
   $.ajax({
     url: baseUrl + 'forms/business.php',
     method: 'POST',
     data: data,
     dataType: 'json',
     success: function(res) {
-      console.log('res', res);
+
       sweetAlert("Alright!", "Business Saved!", "success");
+
+      // update table
+      $(editing.target).parent().parent().find('.id').text(data.id);
+      $(editing.target).parent().parent().find('.name').text(data.name);
+      $(editing.target).parent().parent().find('.address').text(data.address);
+      $(editing.target).parent().parent().find('.city').text(data.city);
+      $(editing.target).parent().parent().find('.state').text(data.state);
+      $(editing.target).parent().parent().find('.phone').text(data.phone);
+      $(editing.target).parent().parent().find('.website').text(data.website);
+      $(editing.target).parent().parent().find('.notes').text(data.notes);
+      $(editing.target).parent().parent().find('.latitude').text(data.latitude);
+      $(editing.target).parent().parent().find('.longitude').text(data.longitude);
+
+      //close modal
+      $('#editModal').modal('hide');
+      $('.modal-backdrop').remove();
     },
     error: function(error) {
       console.error('error', error);
       var err = null;
-      if (typeof(err.responseText) !== 'undefined')\
+      if ( error && typeof(error.responseText) !== 'undefined')
       {
         err = JSON.parse(error.responseText);
         console.log('err', err);
@@ -215,19 +235,18 @@ $('body').on('click', '#saveBussiness', function(e){
       var errString = "";
       if (err && typeof(err.errors) != 'undefined'  && err.errors.length > 0)
       {
-        err.errors.forEach(function(e,i){
+        err.errors.forEach(function( e, i){
           errString += " " + e;
         })
       }
+      console.log('err string', errString);
 
       sweetAlert("Oops...", "Something went wrong!" + errString, "error");
     }
   });
+
+
 })
 
 </script>
 </html>
-<?php
-$mysqli->close();
-exit();
-?>
