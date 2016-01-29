@@ -7,8 +7,8 @@ if ($mysqli->connect_errno) {
 } else {
   echo "db connection ok <br>";
 }
-// Get the user's food items from the database
-$stmt = $mysqli->prepare('SELECT* FROM categories ORDER BY name ASC;');
+// Get the user's categories &  items
+$stmt = $mysqli->prepare('SELECT* FROM categories ORDER BY id ASC;');
 if ($stmt->execute()) {
   $result = $stmt->get_result();
   $businesses = $result->fetch_all(MYSQLI_ASSOC);
@@ -16,6 +16,13 @@ if ($stmt->execute()) {
 $stmt->fetch();
 $stmt->close();
 
+$stmt = $mysqli->prepare('SELECT categories.id as cat_id, categories.name as cat_name, items.id as item_id, items.name as item_name from categories LEFT OUTER JOIN itemMap ON itemMap.category_id = categories.id LEFT OUTER JOIN items on itemMap.item_id = items.id ORDER BY categories.name ASC;');
+if ($stmt->execute()) {
+  $result = $stmt->get_result();
+  $items = $result->fetch_all(MYSQLI_ASSOC);
+}
+$stmt->fetch();
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,19 +33,32 @@ $stmt->close();
 <body>
   <?php include 'partials/nav.php';?>
   <div class="container">
+    <div class="col-xs-12">
+      <div class="row group">
+        <div class="btn-group">
+          <button  class="btn btn-primary"> Add A New Category </button>
+          <button  class="btn btn-default"> Add A New Item </button>
+        </div>
+      </div>
+    </div>
 
     <table class="table table-striped">
       <thead>
         <tr>
-          <th> #id  </th>
-          <th> Name </th>
-          <th> Edit </th>
+          <th> #id   </th>
+          <th> Name  </th>
+          <th> Items </th>
+          <th> Edit  </th>
         </tr>
       </thead>
       <tbody>
         <?php
         foreach ($businesses as $b) {
-          echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td><button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td> </tr>";
+          echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td><td><ul class='items'>";
+          for($i=0; $i<count($items); $i++) {
+            if ( $items[$i]['cat_id'] == $b['id'] )  echo "<li>  " . $items[$i]['item_name'] . "  </li>";
+          }
+          echo "</ul></td> <td><button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td> </tr>";
         }
         ?>
       </tbody>
@@ -51,7 +71,7 @@ $stmt->close();
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Edit Business</h4>
+            <h4 class="modal-title" id="myModalLabel">Edit Category and Items</h4>
           </div>
           <div class="modal-body">
 
@@ -72,7 +92,7 @@ $stmt->close();
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="saveItems">Save changes</button>
+            <button type="button" class="btn btn-primary" id="saveItems" data-dismiss="modal">Save changes</button>
           </div>
         </div>
       </div>
@@ -94,16 +114,35 @@ $stmt->close();
 <script src="dependencies/tags/bootstrap-tagsinput.min.js"></script>
 <link href="dependencies/tags/bootstrap-tagsinput.css" rel="stylesheet">
 
+<!-- Sweet Alerts -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet" >
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
 <style>
 .bootstrap-tagsinput {
   width: 100% !important;
   min-height: 170px !important;
+}
+ul {
+  max-height: 250px;
+  overflow: scroll;
+}
+.group {
+  margin: 0 auto;
+  width: 376px;
+  margin-bottom: 25px;
+  margin-top: 25px;
+  outline: 1px solid #606060;
+  padding: 20px;
+  text-align: center;
 }
 </style>
 
 <script>
 var items = [];
 var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
+var existingItems = [];
+var editing;
 
 function tokenize() {
 
@@ -119,7 +158,7 @@ function tokenize() {
     allowDuplicates: false,
     trimValue: true,
     itemText: function(item) {
-      console.log('item', item);
+      //console.log('item', item);
       return item;
     },
     typeaheadjs: {
@@ -147,16 +186,35 @@ function tokenize() {
      event.cancel = true;
   });
 
+  $('#tags').tagsinput('removeAll');
+  existingItems.forEach(function(e,i){
+    if(e) $('#tags').tagsinput('add', e);
+  })
+
 
 }
 $('body').on('click', '.edit', function(e){
   console.log('event!');
+  editing = e;
+
 
   // set items in modal
   var id        = $(e.target).parent().parent().find('.id').text();
   var name      = $(e.target).parent().parent().find('.name').text();
-  $('#id').val(id);
-  $('#name').val(name);
+  var cat_items     = $(e.target).parent().parent().find('.items').text();
+
+  console.log('id', id, name, cat_items);
+  $('#id').val(id.trim());
+  $('#name').val(name.trim());
+  cat_items = cat_items.split('   ');
+  existingItems = cat_items.map(function(i,idx){
+    if (i.length === 0)
+    {
+      console.log('no zero');
+      return "-1";
+    }
+    return i.trim();
+  });
 
   var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
   //console.log('base ', baseUrl);
@@ -166,7 +224,7 @@ $('body').on('click', '.edit', function(e){
     dataType: 'json',
     success: function(res) {
       items = res;
-      console.log('res', res);
+      //console.log('res', res);
       /* Set up typeahead */
       tokenize();
     },
@@ -198,7 +256,15 @@ $('body').on('click', '#saveItems', function(e){
     dataType: 'json',
     success: function(res) {
       console.log('save res', res);
-      //sweetAlert("Alright!", "Business Saved!", "success");
+      $(editing.target).parent().parent().find('.name').text($('#name').val());
+      var htmlString = "";
+      selectedArray.forEach(function(s,i){
+         htmlString += "<li>" + s.name + "   </li>";
+      })
+      console.log('html string', htmlString);
+      $(editing.target).parent().parent().find('.items').html(htmlString);
+      // add items to that row
+      sweetAlert("Alright!", "Category and Items Saved!", "success");
     },
     error: function(error) {
       console.error('error', error);
