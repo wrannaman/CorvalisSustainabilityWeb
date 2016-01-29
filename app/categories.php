@@ -66,7 +66,7 @@ $stmt->close();
               </div>
 
 
-              <input type="text" class="form-control" id="tags" value="red,green,blue" />
+              <input type="text" class="form-control" id="tags" value="" />
 
             </form>
           </div>
@@ -103,9 +103,10 @@ $stmt->close();
 
 <script>
 var items = [];
+var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
+
 function tokenize() {
 
-  var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
 
   var bh = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -136,8 +137,14 @@ function tokenize() {
 
   $('#tags').on('beforeItemAdd', function(event) {
      var tag = event.item;
-     // Do some processing here
-     console.log('tag', tag);
+
+     for (var i=0; i<items.length; i++) {
+       if (items[i].name.indexOf(tag) !== -1) {
+         // allow them to add it.
+         return true
+       }
+     }
+     event.cancel = true;
   });
 
 
@@ -160,36 +167,43 @@ $('body').on('click', '.edit', function(e){
     success: function(res) {
       items = res;
       console.log('res', res);
-      //sweetAlert("Alright!", "Item Saved Saved!", "success");
-      //close modal
-      // $('#editModal').modal('hide');
-      // $('.modal-backdrop').remove();
-
       /* Set up typeahead */
       tokenize();
     },
     error: function(error) {
-      //sweetAlert("Oops...", "Something went wrong!" + errString, "error");
+      sweetAlert("Oops...", "Something went wrong!" + error, "error");
     }
   });
+});
+$('body').on('click', '#saveItems', function(e){
 
-  $('body').on('click', '#saveItems', function(e){
-
-    console.log('items', $("#tags").tagsinput('items'));
-    var selected = $("#tags").tagsinput('items');
-    var selectedArray = [];
-    items.forEach(function(it,idx){
-      for (var i = 0; i< selected.length; i++ ) {
-        if (it.name.indexOf(selected[i]) !== -1 ) {
-          selectedArray.push(it);
-          break;
-        }
+  console.log('items', $("#tags").tagsinput('items'));
+  var selected = $("#tags").tagsinput('items');
+  var selectedArray = [];
+  items.forEach(function(it,idx){
+    for (var i = 0; i< selected.length; i++ ) {
+      if (it.name.indexOf(selected[i]) !== -1 ) {
+        selectedArray.push(it);
+        break;
       }
-    });
-    console.log('final selected items', selectedArray);
-  })
+    }
+  });
+  console.log('final selected items', selectedArray);
+  // send selectedArray and the current item's name
 
-
+  $.ajax({
+    url: baseUrl + 'forms/saveItems.php',
+    method: 'POST',
+    data: JSON.stringify({selected: selectedArray, name: $('#name').val(), id: Number($('#id').val())}),
+    dataType: 'json',
+    success: function(res) {
+      console.log('save res', res);
+      //sweetAlert("Alright!", "Business Saved!", "success");
+    },
+    error: function(error) {
+      console.error('error', error);
+    }
+  });
 
 })
 
