@@ -8,15 +8,7 @@ if ($mysqli->connect_errno) {
   echo "db connection ok <br>";
 }
 // Get the user's categories &  items
-$stmt = $mysqli->prepare('SELECT* FROM categories ORDER BY id ASC;');
-if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $businesses = $result->fetch_all(MYSQLI_ASSOC);
-}
-$stmt->fetch();
-$stmt->close();
-
-$stmt = $mysqli->prepare('SELECT categories.id as cat_id, categories.name as cat_name, items.id as item_id, items.name as item_name from categories LEFT OUTER JOIN itemMap ON itemMap.category_id = categories.id LEFT OUTER JOIN items on itemMap.item_id = items.id ORDER BY categories.name ASC;');
+$stmt = $mysqli->prepare('SELECT* FROM items ORDER BY id ASC;');
 if ($stmt->execute()) {
   $result = $stmt->get_result();
   $items = $result->fetch_all(MYSQLI_ASSOC);
@@ -36,7 +28,7 @@ $stmt->close();
     <div class="col-xs-12">
       <div class="row group">
         <div class="btn-group">
-          <button  class="btn btn-primary" data-toggle='modal' data-target='#catModal'> Add A New Category </button>
+          <button  class="btn btn-default" data-toggle='modal' data-target='#itModal'> Add A New Item </button>
         </div>
       </div>
     </div>
@@ -44,10 +36,10 @@ $stmt->close();
     <table class="table table-striped">
       <thead>
         <tr>
-          <th> #id   </th>
-          <th> Category  </th>
-          <th> Items </th>
-          <th> Edit  </th>
+          <th> #id     </th>
+          <th> Name    </th>
+          <th> Edit    </th>
+          <th> Delete  </th>
         </tr>
       </thead>
       <tbody>
@@ -90,8 +82,6 @@ $stmt->close();
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal" id="delCat">Delete Category</button>
-
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="saveItems" data-dismiss="modal">Save changes</button>
           </div>
@@ -124,6 +114,30 @@ $stmt->close();
       </div>
     </div>
 
+    <div class="modal fade" id="itModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Add A Category</h4>
+          </div>
+          <div class="modal-body">
+
+            <form id="addCatForm">
+              <div class="form-group">
+                <label for="exampleInputEmail1">name</label>
+                <input type="text" class="form-control" id="itName" placeholder="name" >
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="saveIt" data-dismiss="modal">Add Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </body>
 
@@ -145,23 +159,23 @@ $stmt->close();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
 <style>
-  .bootstrap-tagsinput {
-    width: 100% !important;
-    min-height: 170px !important;
-  }
-  ul {
-    max-height: 250px;
-    overflow: scroll;
-  }
-  .group {
-    margin: 0 auto;
-    width: 376px;
-    margin-bottom: 25px;
-    margin-top: 25px;
-    outline: 1px solid #606060;
-    padding: 20px;
-    text-align: center;
-  }
+.bootstrap-tagsinput {
+  width: 100% !important;
+  min-height: 170px !important;
+}
+ul {
+  max-height: 250px;
+  overflow: scroll;
+}
+.group {
+  margin: 0 auto;
+  width: 376px;
+  margin-bottom: 25px;
+  margin-top: 25px;
+  outline: 1px solid #606060;
+  padding: 20px;
+  text-align: center;
+}
 </style>
 
 <script>
@@ -225,8 +239,8 @@ $('body').on('click', '.edit', function(e){
 
 
   // set items in modal
-  var id            = $(e.target).parent().parent().find('.id').text();
-  var name          = $(e.target).parent().parent().find('.name').text();
+  var id        = $(e.target).parent().parent().find('.id').text();
+  var name      = $(e.target).parent().parent().find('.name').text();
   var cat_items     = $(e.target).parent().parent().find('.items').text();
 
   console.log('id', id, name, cat_items);
@@ -317,42 +331,26 @@ $('body').on('click', '#saveCat', function(e){
     }
   });
 })
-$('body').on('click', '#delCat', function(e){
-  var name =  $('#name').val();
-  var id   =  $('#id').val();
+$('body').on('click', '#saveIt', function(e){
+  console.log('here');
+  var name =  $('#itName').val();
+  if ( name.trim() === '' ) return sweetAlert("Oops...", "please enter a name", "error");
 
-  console.log('deleting!', name);
-
-
-  swal({
-    title: "Are you sure?",
-    text: "You will not be able to undo this!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "Yes, delete " + name + "!",
-    closeOnConfirm: false },
-    function(){
-      // do actual delete
-      console.log('actual delete here', id);
-
-      $.ajax({
-        url: baseUrl + 'forms/deleteCategory.php',
-        method: 'POST',
-        data: JSON.stringify({id: id}),
-        dataType: 'json',
-        success: function(res) {
-          console.log('save res', res);
-          $(editing.target).parent().parent().remove();
-
-          swal("Deleted!", "The category has been deleted.", "success");
-        },
-        error: function(error) {
-          console.error('error', error);
-          swal("Error!", "There was an error deleting this category", "error");
-        }
-      });
-    });
+  console.log('save it', name);
+  $.ajax({
+    url: baseUrl + 'forms/saveItem.php',
+    method: 'POST',
+    data: JSON.stringify({name: name}),
+    dataType: 'json',
+    success: function(res) {
+      console.log('save res', res);
+      sweetAlert("Alright!", "Item was created successfully!", "success");
+    },
+    error: function(error) {
+      console.error('error', error);
+    }
+  });
 })
+$
 </script>
 </html>

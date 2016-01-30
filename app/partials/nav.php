@@ -22,7 +22,7 @@ $(document).ready(function() {
     $('.business').removeClass('active');
     $('.users').removeClass('active');
     $('.categories').removeClass('active');
-
+    $('.items').removeClass('active');
   }
   if (window.location.pathname.indexOf('businesses.php') !== -1 )
   {
@@ -38,6 +38,11 @@ $(document).ready(function() {
   {
     _reset();
     $('.categories').addClass('active');
+  }
+  if (window.location.pathname.indexOf('items.php') !== -1 )
+  {
+    _reset();
+    $('.items').addClass('active');
   }
   //active
 });
@@ -62,6 +67,7 @@ $(document).ready(function() {
         <li class="users"><a href="<?php getCurrentUri() ?>/users.php">Manage Users <span class="sr-only">(current)</span></a></li>
         <li class="business"><a href="<?php getCurrentUri() ?>/businesses.php">Manage Businesses</a></li>
         <li class="categories"><a href="<?php getCurrentUri() ?>/categories.php">Manage Categories</a></li>
+        <li class="items"><a href="<?php getCurrentUri() ?>/items.php">Manage Items</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
