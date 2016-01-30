@@ -44,12 +44,8 @@ $stmt->close();
       </thead>
       <tbody>
         <?php
-        foreach ($businesses as $b) {
-          echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td><td><ul class='items'>";
-          for($i=0; $i<count($items); $i++) {
-            if ( $items[$i]['cat_id'] == $b['id'] )  echo "<li>  " . $items[$i]['item_name'] . "  </li>";
-          }
-          echo "</ul></td> <td><button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td> </tr>";
+        foreach ($items as $b) {
+          echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td><button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td> <td><button class='btn btn-primary delete'> Delete </button></td></tr>";
         }
         ?>
       </tbody>
@@ -62,7 +58,7 @@ $stmt->close();
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Edit Category and Items</h4>
+            <h4 class="modal-title" id="myModalLabel">Edit Item</h4>
           </div>
           <div class="modal-body">
 
@@ -75,9 +71,6 @@ $stmt->close();
                 <label for="exampleInputEmail1">name</label>
                 <input type="text" class="form-control" id="name" placeholder="name" >
               </div>
-
-
-              <input type="text" class="form-control" id="tags" value="" />
 
             </form>
           </div>
@@ -183,153 +176,48 @@ var items = [];
 var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
 var existingItems = [];
 var editing;
-
-function tokenize() {
-
-
-  var bh = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local: items,
-  });
-  bh.initialize();
-
-  $('#tags').tagsinput({
-    allowDuplicates: false,
-    trimValue: true,
-    itemText: function(item) {
-      //console.log('item', item);
-      return item;
-    },
-    typeaheadjs: {
-      name: 'items',
-      displayKey: 'name',
-      valueKey: 'name',
-      source: bh.ttAdapter(),
-    }
-  });
-  $('#tags').tagsinput({
-    onTagExists: function(item, $tag) {
-      $tag.hide().fadeIn();
-    }
-  });
-
-  $('#tags').on('beforeItemAdd', function(event) {
-     var tag = event.item;
-
-     for (var i=0; i<items.length; i++) {
-       if (items[i].name.indexOf(tag) !== -1) {
-         // allow them to add it.
-         return true
-       }
-     }
-     event.cancel = true;
-  });
-
-  $('#tags').tagsinput('removeAll');
-  existingItems.forEach(function(e,i){
-    if(e) $('#tags').tagsinput('add', e);
-  })
-
-
-}
 $('body').on('click', '.edit', function(e){
-  console.log('event!');
   editing = e;
-
-
   // set items in modal
   var id        = $(e.target).parent().parent().find('.id').text();
   var name      = $(e.target).parent().parent().find('.name').text();
-  var cat_items     = $(e.target).parent().parent().find('.items').text();
 
-  console.log('id', id, name, cat_items);
   $('#id').val(id.trim());
   $('#name').val(name.trim());
-  cat_items = cat_items.split('   ');
-  existingItems = cat_items.map(function(i,idx){
-    if (i.length === 0)
-    {
-      console.log('no zero');
-      return "-1";
-    }
-    return i.trim();
-  });
 
-  var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
-  //console.log('base ', baseUrl);
-  $.ajax({
-    url: baseUrl + 'forms/getItems.php',
-    method: 'GET',
-    dataType: 'json',
-    success: function(res) {
-      items = res;
-      //console.log('res', res);
-      /* Set up typeahead */
-      tokenize();
-    },
-    error: function(error) {
-      sweetAlert("Oops...", "Something went wrong!" + error, "error");
-    }
-  });
+  console.log('id', id, name);
+
 });
 $('body').on('click', '#saveItems', function(e){
 
-  console.log('items', $("#tags").tagsinput('items'));
-  var selected = $("#tags").tagsinput('items');
-  var selectedArray = [];
-  items.forEach(function(it,idx){
-    for (var i = 0; i< selected.length; i++ ) {
-      if (it.name.indexOf(selected[i]) !== -1 ) {
-        selectedArray.push(it);
-        break;
-      }
-    }
-  });
-  console.log('final selected items', selectedArray);
-  // send selectedArray and the current item's name
+  $('#id').val();
+  $('#name').val();
+  console.log('save items', id, name);
 
   $.ajax({
-    url: baseUrl + 'forms/saveItems.php',
+    url: baseUrl + 'forms/editItem.php',
     method: 'POST',
-    data: JSON.stringify({selected: selectedArray, name: $('#name').val(), id: Number($('#id').val())}),
+    data: JSON.stringify({ name: $('#name').val(), id: Number($('#id').val())}),
     dataType: 'json',
     success: function(res) {
       console.log('save res', res);
-      $(editing.target).parent().parent().find('.name').text($('#name').val());
-      var htmlString = "";
-      selectedArray.forEach(function(s,i){
-         htmlString += "<li>" + s.name + "   </li>";
-      })
-      console.log('html string', htmlString);
-      $(editing.target).parent().parent().find('.items').html(htmlString);
-      // add items to that row
-      sweetAlert("Alright!", "Category and Items Saved!", "success");
+      // $(editing.target).parent().parent().find('.name').text($('#name').val());
+      // var htmlString = "";
+      // selectedArray.forEach(function(s,i){
+      //    htmlString += "<li>" + s.name + "   </li>";
+      // })
+      // console.log('html string', htmlString);
+      // $(editing.target).parent().parent().find('.items').html(htmlString);
+      // // add items to that row
+      sweetAlert("Alright!", "Item Updated!", "success");
     },
     error: function(error) {
       console.error('error', error);
+      sweetAlert("Oops!", "There was an error saving this item.", "error");
+
     }
   });
 
-})
-$('body').on('click', '#saveCat', function(e){
-  var name =  $('#catName').val();
-  if ( name.trim() === '' ) return sweetAlert("Oops...", "please enter a name", "error");
-
-  console.log('save cat', name);
-  $.ajax({
-    url: baseUrl + 'forms/saveCategory.php',
-    method: 'POST',
-    data: JSON.stringify({name: name}),
-    dataType: 'json',
-    success: function(res) {
-      console.log('save res', res);
-      sweetAlert("Alright!", "Category was created successfully!", "success");
-    },
-    error: function(error) {
-      console.error('error', error);
-    }
-  });
 })
 $('body').on('click', '#saveIt', function(e){
   console.log('here');
@@ -351,6 +239,44 @@ $('body').on('click', '#saveIt', function(e){
     }
   });
 })
-$
+$('body').on('click', '.delete', function(e){
+  editing = e;
+  var id        = $(e.target).parent().parent().find('.id').text();
+  var name      = $(e.target).parent().parent().find('.name').text();
+
+  console.log('deleting', id, name);
+  swal({
+    title: "Are you sure?",
+    text: "You will not be able to undo this!",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "Yes, delete " + name + "!",
+    closeOnConfirm: false },
+    function(){
+      // do actual delete
+      console.log('actual delete here', id);
+
+      $.ajax({
+        url: baseUrl + 'forms/deleteItem.php',
+        method: 'POST',
+        data: JSON.stringify({id: id}),
+        dataType: 'json',
+        success: function(res) {
+          console.log('save res', res);
+          $(editing.target).parent().parent().remove();
+
+          swal("Deleted!", "The item has been deleted.", "success");
+        },
+        error: function(error) {
+          console.error('error', error);
+          swal("Error!", "There was an error deleting this item", "error");
+        }
+      });
+    });
+
+
+
+})
 </script>
 </html>

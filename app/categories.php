@@ -85,7 +85,10 @@ $stmt->close();
               </div>
 
 
-              <input type="text" class="form-control" id="tags" value="" />
+              <div class="form-group">
+                <label for="exampleInputEmail1">Items</label>
+                <input type="text" class="form-control" id="tags" value="" />
+              </div>
 
             </form>
           </div>

@@ -10,7 +10,7 @@ if ($mysqli->connect_errno) {
 
 // Get the businesses from the database
 $stmt = $mysqli->prepare(
-  'SELECT* FROM businesses ORDER BY name ASC;'
+  'SELECT * FROM businesses ORDER BY name ASC;'
 );
 if ($stmt->execute()) {
   $result = $stmt->get_result();
@@ -18,6 +18,14 @@ if ($stmt->execute()) {
 }
 $stmt->fetch();
 $stmt->close();
+
+$stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, items.id as item_id, items.name as item_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN items on busMap.item_id = items.id ORDER BY businesses.name ASC;');
+if ($stmt->execute()) {
+  $result = $stmt->get_result();
+  $items = $result->fetch_all(MYSQLI_ASSOC);
+}
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,11 +33,27 @@ $stmt->close();
   <title>Corvalis Sustainability App</title>
 </head>
 <style>
-.website {
-  max-width: 200px;
-  padding-right: 10px !important;
-  overflow-wrap: break-word;
-}
+  .website {
+    max-width: 200px;
+    padding-right: 10px !important;
+    overflow-wrap: break-word;
+  }
+
+  .bootstrap-tagsinput {
+      width: 100% !important;
+      min-height: 170px !important;
+  }
+  ul {
+    display: inline;
+  }
+  li {
+    float: left;
+    width: auto;
+    margin-left: 10px;
+  }
+  .items-td {
+    border-top: none !important;
+  }
 </style>
 
 <body>
@@ -55,7 +79,13 @@ $stmt->close();
       <tbody>
         <?php
           foreach ($businesses as $b) {
-            echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td class='address'> $b[address] </td> <td class='city'>$b[city]</td> <td class='state'> $b[state] </td> <td class='phone'>$b[phone]</td> <td class='website'>$b[website]</td> <td class='notes'>$b[notes]</td> <td class='latitude'>$b[latitude]</td> <td class='longitude'>$b[longitude]</td> <td> <button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td> </tr>";
+            echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td class='address'> $b[address] </td> <td class='city'>$b[city]</td> <td class='state'> $b[state] </td> <td class='phone'>$b[phone]</td> <td class='website'>$b[website]</td> <td class='notes'>$b[notes]</td> <td class='latitude'>$b[latitude]</td> <td class='longitude'>$b[longitude]</td> <td> <button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td>";
+            echo "</tr><tr class='items-tr'><td class='items-td' colspan='11'>  <div class='items-div'> <ul class='items-" . $b['id']  ."'>";
+            // loop
+            for($i=0; $i<count($items); $i++) {
+              if ( $items[$i]['bz_id'] == $b['id'] )  echo "<li>  " . $items[$i]['item_name'] . "  </li>";
+            }
+            echo "</ul> </div> </td></tr>";
           }
         ?>
       </tbody>
@@ -74,7 +104,7 @@ $stmt->close();
       <div class="modal-body">
 
         <form id="editForm">
-          <div class="form-group">
+          <div class="form-group" style="display:none;">
             <label for="exampleInputEmail1">id</label>
             <input type="text" class="form-control" id="id" placeholder="id" disabled>
           </div>
@@ -87,37 +117,53 @@ $stmt->close();
             <input type="text" class="form-control" id="address" placeholder="Address">
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1">City</label>
-            <input type="text" class="form-control" id="city" placeholder="City">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">City</label>
+                <input type="text" class="form-control" id="city" placeholder="City">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">State</label>
+                <input type="text" class="form-control" id="state" placeholder="State">
+              </div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1">State</label>
-            <input type="text" class="form-control" id="state" placeholder="State">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">Phone</label>
-            <input type="text" class="form-control" id="phone" placeholder="Phone">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">Website</label>
-            <input type="text" class="form-control" id="website" placeholder="Website">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Phone</label>
+                <input type="text" class="form-control" id="phone" placeholder="Phone">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Website</label>
+                <input type="text" class="form-control" id="website" placeholder="Website">
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Notes</label>
             <input type="text" class="form-control" id="notes" placeholder="Notes">
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1">Latitude</label>
-            <input type="number" class="form-control" id="latitude" placeholder="Latitude">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Longitude</label>
+                <input type="number" class="form-control" id="longitude" placeholder="Longitude">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Latitude</label>
+                <input type="number" class="form-control" id="latitude" placeholder="Latitude">
+              </div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1">Longitude</label>
-            <input type="number" class="form-control" id="longitude" placeholder="Longitude">
+            <label for="exampleInputEmail1">Items</label>
+            <input type="text" class="form-control" id="tags" value="" />
           </div>
         </form>
-
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="deleteBusiness" data-dismiss="modal">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="saveBussiness">Save changes</button>
       </div>
@@ -131,6 +177,17 @@ $stmt->close();
 <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
 
+
+<!-- typeahead -->
+<script src="dependencies/typeahead.js/typeahead.bundle.min.js"></script>
+<script src="dependencies/typeahead.js/typeahead.jquery.min.js"></script>
+<script src="dependencies/typeahead.js/bloodhound.min.js"></script>
+<link href="dependencies/typeahead.js/css.css" rel="stylesheet">
+
+<script src="dependencies/tags/bootstrap-tagsinput.min.js"></script>
+<link href="dependencies/tags/bootstrap-tagsinput.css" rel="stylesheet">
+
+
 <!-- Sweet Alerts -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet" >
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
@@ -138,6 +195,58 @@ $stmt->close();
 <script>
 /* Put data in modal */
 var editing;
+var items   = [];
+var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
+
+function tokenize() {
+
+
+  var bh = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    local: items,
+  });
+  bh.initialize();
+
+  $('#tags').tagsinput({
+    allowDuplicates: false,
+    trimValue: true,
+    itemText: function(item) {
+      //console.log('item', item);
+      return item;
+    },
+    typeaheadjs: {
+      name: 'items',
+      displayKey: 'name',
+      valueKey: 'name',
+      source: bh.ttAdapter(),
+    }
+  });
+  $('#tags').tagsinput({
+    onTagExists: function(item, $tag) {
+      $tag.hide().fadeIn();
+    }
+  });
+
+  $('#tags').on('beforeItemAdd', function(event) {
+     var tag = event.item;
+
+     for (var i=0; i<items.length; i++) {
+       if (items[i].name.indexOf(tag) !== -1) {
+         // allow them to add it.
+         return true
+       }
+     }
+     event.cancel = true;
+  });
+
+  $('#tags').tagsinput('removeAll');
+  existingItems.forEach(function(e,i){
+    if(e) $('#tags').tagsinput('add', e);
+  })
+
+
+}
 $('body').on('click', '.edit', function(e){
   console.log('clicked', $(e.target));
   editing = e;
@@ -152,6 +261,10 @@ $('body').on('click', '.edit', function(e){
   var notes     = $(e.target).parent().parent().find('.notes').text();
   var latitude  = $(e.target).parent().parent().find('.latitude').text();
   var longitude = $(e.target).parent().parent().find('.longitude').text();
+  var query     = '.items-' + id.trim();
+  var cat_items = $(query).text();
+  console.log('id', query);
+  console.log('cat_items', cat_items);
 
 
   $('#id').val(id);
@@ -165,15 +278,29 @@ $('body').on('click', '.edit', function(e){
   $('#latitude').val(latitude);
   $('#longitude').val(longitude);
 
-  // console.log('name', name);
-  // console.log('address', address);
-  // console.log('city', city);
-  // console.log('state', state);
-  // console.log('phone', phone);
-  // console.log('website', website);
-  // console.log('notes', notes);
-  // console.log('latitude', latitude);
-  // console.log('longitude', longitude);
+  cat_items = cat_items.split('   ');
+  existingItems = cat_items.map(function(i,idx){
+    if (i.length === 0)
+    {
+      return "-1";
+    }
+    return i.trim();
+  });
+
+  $.ajax({
+    url: baseUrl + 'forms/getItems.php',
+    method: 'GET',
+    dataType: 'json',
+    success: function(res) {
+      items = res;
+      //console.log('res', res);
+      /* Set up typeahead */
+      tokenize();
+    },
+    error: function(error) {
+      sweetAlert("Oops...", "Something went wrong!" + error, "error");
+    }
+  });
 
 });
 
@@ -192,12 +319,24 @@ $('body').on('click', '#saveBussiness', function(e){
     longitude : $('#longitude').val().trim() ? Number($('#longitude').val().trim()) : -1,
   }
 
+  var selected = $("#tags").tagsinput('items');
+  var selectedArray = [];
+  items.forEach(function(it,idx){
+    for (var i = 0; i< selected.length; i++ ) {
+      if (it.name.indexOf(selected[i]) !== -1 ) {
+        selectedArray.push(it);
+        break;
+      }
+    }
+  });
+  console.log('final selected items', selectedArray);
+  data.selected = selectedArray;
+
   //console.log('* * Form Submission * *');
-  //console.log('data', data);
+  console.log('data', data);
 
   /* Post to /forms/businesses to save */
   // Submit #add-item-form using AJAX
-  var baseUrl = window.location.href.substr( 0, window.location.href.lastIndexOf('/') + 1 );
   //console.log('base ', baseUrl);
   $.ajax({
     url: baseUrl + 'forms/business.php',
@@ -248,5 +387,43 @@ $('body').on('click', '#saveBussiness', function(e){
 
 })
 
+$('body').on('click', '#deleteBusiness', function(e){
+  var id        = $('#id').val();
+  var name      = $('#name').val();
+  var displayName =  name.length > 10 ? (name.substr(0,10) + ' ... ') : name;
+
+  console.log('deleting', id, name);
+  swal({
+    title: "Are you sure?",
+    text: "You will not be able to undo this!",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "Yes, delete " + displayName + "!",
+    closeOnConfirm: false },
+    function(){
+      // do actual delete
+      console.log('actual delete here', id);
+
+      $.ajax({
+        url: baseUrl + 'forms/deleteBusiness.php',
+        method: 'POST',
+        data: JSON.stringify({id: id}),
+        dataType: 'json',
+        success: function(res) {
+          console.log('save res', res);
+          $(editing.target).parent().parent().remove();
+
+          swal("Deleted!", "The business has been deleted.", "success");
+        },
+        error: function(error) {
+          console.error('error', error);
+          swal("Error!", "There was an error deleting this business", "error");
+        }
+      });
+    });
+
+
+})
 </script>
 </html>

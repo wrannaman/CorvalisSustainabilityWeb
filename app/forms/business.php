@@ -105,6 +105,30 @@ $_POST['id'] );
 if( $stmt->execute() ) {
   $response = ['success' => true];
 }
+
+// delete all items from item map for this business
+
+// delete all old ones and save the new ones
+$stmt = $mysqli->prepare("DELETE FROM busMap WHERE bus_id = ?");
+$stmt->bind_param('i', $_POST['id'] );
+if( $stmt->execute() ) {
+  $response = ['success' => true];
+} else {
+    printf("Errormessage: %s\n", $mysqli->error);
+}
+
+// // create new ones
+for($i=0; $i<count($_POST['selected']); $i++) {
+
+  $stmt = $mysqli->prepare("INSERT INTO busMap (bus_id, item_id) VALUES (?,?)");
+  $stmt->bind_param('ii',$_POST['id'], $_POST['selected'][$i]["id"] );
+  if( $stmt->execute() ) {
+    $response = ['success' => true];
+  }
+
+}
+
+
 $stmt->close();
 $mysqli->close();
 // If we make it this far then we'll simply return a successful response
