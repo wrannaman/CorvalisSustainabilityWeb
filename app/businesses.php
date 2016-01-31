@@ -10,7 +10,7 @@ if ($mysqli->connect_errno) {
 
 // Get the businesses from the database
 $stmt = $mysqli->prepare(
-  'SELECT * FROM businesses ORDER BY name ASC;'
+  'SELECT * FROM businesses ORDER BY id ASC;'
 );
 if ($stmt->execute()) {
   $result = $stmt->get_result();
@@ -19,7 +19,7 @@ if ($stmt->execute()) {
 $stmt->fetch();
 $stmt->close();
 
-$stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, items.id as item_id, items.name as item_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN items on busMap.item_id = items.id ORDER BY businesses.name ASC;');
+$stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, items.id as item_id, items.name as item_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN items on busMap.item_id = items.id ORDER BY businesses.id ASC;');
 if ($stmt->execute()) {
   $result = $stmt->get_result();
   $items = $result->fetch_all(MYSQLI_ASSOC);
@@ -54,17 +54,55 @@ if ($stmt->execute()) {
   .items-td {
     border-top: none !important;
   }
+  .group {
+    margin: 0 auto;
+    width: 376px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    outline: 1px solid #606060;
+    padding: 20px;
+    text-align: center;
+  }
+  .row.group {
+    margin: 0 auto;
+    margin-bottom: 25px;
+  }
+  .inline {
+    display: inline;
+    width: 100%;
+  }
+  .inline:after {
+     visibility: hidden;
+     display: block;
+     font-size: 0;
+     content: " ";
+     clear: both;
+     height: 0;
+  }
+  .radio-inline {
+    float:left;
+    width: 100px;
+  }
 </style>
 
 <body>
   <?php include 'partials/nav.php';?>
   <div class="container">
 
+    <div class="col-xs-12">
+      <div class="row group">
+        <div class="btn-group">
+          <button  class="btn btn-primary" data-toggle='modal' data-target='#busModal'> Add A New Business </button>
+        </div>
+      </div>
+    </div>
+
     <table class="table table-striped">
       <thead>
         <tr>
           <th>id</th>
           <th>Business Name</th>
+          <th>Type</th>
           <th>Address</th>
           <th>City</th>
           <th>State</th>
@@ -79,7 +117,7 @@ if ($stmt->execute()) {
       <tbody>
         <?php
           foreach ($businesses as $b) {
-            echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td class='address'> $b[address] </td> <td class='city'>$b[city]</td> <td class='state'> $b[state] </td> <td class='phone'>$b[phone]</td> <td class='website'>$b[website]</td> <td class='notes'>$b[notes]</td> <td class='latitude'>$b[latitude]</td> <td class='longitude'>$b[longitude]</td> <td> <button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td>";
+            echo "<tr> <th scope='row' class='id'> $b[id] </th> <td class='name'> $b[name] </td> <td class='type'> $b[type] </td> <td class='address'> $b[address] </td> <td class='city'>$b[city]</td> <td class='state'> $b[state] </td> <td class='phone'>$b[phone]</td> <td class='website'>$b[website]</td> <td class='notes'>$b[notes]</td> <td class='latitude'>$b[latitude]</td> <td class='longitude'>$b[longitude]</td> <td> <button class='btn btn-primary edit' data-toggle='modal' data-target='#editModal'> Edit </button></td>";
             echo "</tr><tr class='items-tr'><td class='items-td' colspan='11'>  <div class='items-div'> <ul class='items-" . $b['id']  ."'>";
             // loop
             for($i=0; $i<count($items); $i++) {
@@ -111,6 +149,17 @@ if ($stmt->execute()) {
           <div class="form-group">
             <label for="exampleInputEmail1">Business Name</label>
             <input type="text" class="form-control" id="name" placeholder="Name">
+          </div>
+          <div class="form-group inline">
+            <div class="radio radio-inline">
+              <label><input type="radio" name="type" value="reuse">Reuse</label>
+            </div>
+            <div class="radio radio-inline" style="margin-top: 10px;">
+              <label><input type="radio" name="type" value="repair">Repair</label>
+            </div>
+            <div class="radio radio-inline" style="margin-top: 10px;">
+              <label><input type="radio" name="type" value="both">Both</label>
+            </div>
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Address</label>
@@ -166,6 +215,88 @@ if ($stmt->execute()) {
         <button type="button" class="btn btn-danger" id="deleteBusiness" data-dismiss="modal">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="saveBussiness">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="busModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Create A Business</h4>
+      </div>
+      <div class="modal-body">
+
+        <form id="createForm">
+          <div class="form-group" style="display:none;">
+            <label for="exampleInputEmail1">id</label>
+            <input type="text" class="form-control" id="id1" placeholder="id" disabled>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Business Name</label>
+            <input type="text" class="form-control" id="name1" placeholder="Name">
+          </div>
+          <div class="form-group inline">
+            <div class="radio radio-inline">
+              <label><input type="radio" name="type" value="reuse">Reuse</label>
+            </div>
+            <div class="radio radio-inline" style="margin-top: 10px;">
+              <label><input type="radio" name="type" value="repair">Repair</label>
+            </div>
+            <div class="radio radio-inline" style="margin-top: 10px;">
+              <label><input type="radio" name="type" value="both">Both</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Address</label>
+            <input type="text" class="form-control" id="address1" placeholder="Address">
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">City</label>
+                <input type="text" class="form-control" id="city1" placeholder="City">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">State</label>
+                <input type="text" class="form-control" id="state1" placeholder="State">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Phone</label>
+                <input type="text" class="form-control" id="phone1" placeholder="Phone">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Website</label>
+                <input type="text" class="form-control" id="website1" placeholder="Website">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Notes</label>
+            <input type="text" class="form-control" id="notes1" placeholder="Notes">
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Longitude</label>
+                <input type="number" class="form-control" id="longitude1" placeholder="Longitude">
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Latitude</label>
+                <input type="number" class="form-control" id="latitude1" placeholder="Latitude">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createBus">Save changes</button>
       </div>
     </div>
   </div>
@@ -253,6 +384,7 @@ $('body').on('click', '.edit', function(e){
 
   var id        = $(e.target).parent().parent().find('.id').text();
   var name      = $(e.target).parent().parent().find('.name').text();
+  var type      = $(e.target).parent().parent().find('.type').text();
   var address   = $(e.target).parent().parent().find('.address').text();
   var city      = $(e.target).parent().parent().find('.city').text();
   var state     = $(e.target).parent().parent().find('.state').text();
@@ -277,6 +409,11 @@ $('body').on('click', '.edit', function(e){
   $('#notes').val(notes);
   $('#latitude').val(latitude);
   $('#longitude').val(longitude);
+
+  var $radios = $('input:radio[name=type]');
+
+  $radios.prop('checked', false);
+  $radios.filter('[value=' + type +']').prop('checked', true);
 
   cat_items = cat_items.split('   ');
   existingItems = cat_items.map(function(i,idx){
@@ -309,6 +446,7 @@ $('body').on('click', '#saveBussiness', function(e){
   var data = {
     id        : $('#id').val().trim(),
     name      : $('#name').val().trim(),
+    type      : $('input[name=type]:checked', '#editForm').val(),
     address   : $('#address').val().trim(),
     city      : $('#city').val().trim(),
     state     : $('#state').val().trim(),
@@ -318,6 +456,8 @@ $('body').on('click', '#saveBussiness', function(e){
     latitude  : $('#latitude').val().trim() ? Number($('#latitude').val().trim()) : -1,
     longitude : $('#longitude').val().trim() ? Number($('#longitude').val().trim()) : -1,
   }
+
+  console.log('type', data.type);
 
   var selected = $("#tags").tagsinput('items');
   var selectedArray = [];
@@ -422,6 +562,47 @@ $('body').on('click', '#deleteBusiness', function(e){
         }
       });
     });
+
+
+})
+
+$('body').on('click', '#createBus', function(e){
+  console.log('create');
+
+  var data = {
+    name      : $('#name1').val(),
+    type      : $('input[name=type]:checked', '#createForm').val(),
+    address   : $('#address1').val(),
+    city      : $('#city1').val(),
+    state     : $('#state1').val(),
+    phone     : $('#phone1').val(),
+    website   : $('#website1').val(),
+    notes     : $('#notes1').val(),
+    latitude  : $('#latitude1').val(),
+    longitude : $('#longitude1').val(),
+  }
+
+  console.log('data type', data.type);
+
+  if ( !data.name ) return swal("Error!", "A business needs a name.", "error");
+
+  $.ajax({
+    url: baseUrl + 'forms/createBusiness.php',
+    method: 'POST',
+    data: JSON.stringify(data),
+    dataType: 'json',
+    success: function(res) {
+      console.log('save res', res);
+      swal("Created!", "The business has been created.", "success");
+    },
+    error: function(error) {
+      console.error('error', error);
+      swal("Error!", "There was an error creating this business", "error");
+    }
+  });
+
+
+
 
 
 })

@@ -8,3 +8,11 @@ RewriteCond %{REQUEST_URI} ^/subdirectoryname1/(.*)$ [OR]
 RewriteCond %{REQUEST_URI} ^/subdirectoryname2/(.*)$ [OR]
 RewriteRule ^.*$ - [L]
 </IfModule>
+
+
+
+@TODO
+
+ - Do JSON api
+ - add business type to businesses.
+ - add a user authentication ( with password reset email )

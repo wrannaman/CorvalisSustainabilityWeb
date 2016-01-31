@@ -91,8 +91,9 @@ if ($mysqli->connect_errno) {
     $response['errors'][] = 'Database connection failed';
 }
 
-$stmt = $mysqli->prepare("UPDATE businesses SET name = ? , address = ?,city = ?,state = ?,phone = ?,website = ?,notes = ?,latitude = ?,longitude = ? WHERE id = ?");
-$stmt->bind_param('ssssssssss', $_POST['name'],
+$stmt = $mysqli->prepare("UPDATE businesses SET name = ? , type = ?,  address = ?,city = ?,state = ?,phone = ?,website = ?,notes = ?,latitude = ?,longitude = ? WHERE id = ?");
+$stmt->bind_param('sssssssssss', $_POST['name'],
+$_POST['type'],
 $_POST['address'],
 $_POST['city'],
 $_POST['state'],
