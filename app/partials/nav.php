@@ -13,7 +13,7 @@ function getCurrentUri() {
   $uri = '/' . trim($uri, '/');
   $bodytag = str_replace($uri, "", "http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
   echo "$bodytag";
-  return $bodytag;
+  //return $bodytag;
 }
 ?>
 <script>
@@ -64,10 +64,12 @@ $(document).ready(function() {
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="users"><a href="<?php getCurrentUri() ?>/users.php">Manage Users <span class="sr-only">(current)</span></a></li>
+        <li class="users"><a href="<?php getCurrentUri() ?>/users.php">Settings <span class="sr-only">(current)</span></a></li>
         <li class="business"><a href="<?php getCurrentUri() ?>/businesses.php">Manage Businesses</a></li>
         <li class="categories"><a href="<?php getCurrentUri() ?>/categories.php">Manage Categories</a></li>
         <li class="items"><a href="<?php getCurrentUri() ?>/items.php">Manage Items</a></li>
+        <li class="logout"><a href="<?php getCurrentUri() ?>/logout.php">Logout</a></li>
+
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

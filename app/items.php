@@ -1,4 +1,21 @@
 <?php
+session_start();
+session_regenerate_id();
+function getCurrentUri4() {
+  $basepath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
+  $uri = substr($_SERVER['REQUEST_URI'], strlen($basepath));
+  if (strstr($uri, '?')) $uri = substr($uri, 0, strpos($uri, '?'));
+  $uri = '/' . trim($uri, '/');
+  $bodytag = str_replace($uri, "", "http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
+  return $bodytag;
+}
+
+if(!isset($_SESSION['user']))      // if there is no valid session
+{
+    $location = getCurrentUri4() . "/login.php";
+    header("Location: " . $location );
+}
+
 require_once 'config/db.php';
 // Create the database connection
 $mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
