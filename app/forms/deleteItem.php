@@ -22,6 +22,11 @@ require_once '../config/db.php';
 $mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
 if ($mysqli->connect_errno) { $response['errors'][] = 'Database connection failed'; };
 
+$stmt = $mysqli->prepare("DELETE FROM busMap WHERE item_id = ?");
+$stmt->bind_param('i', $data['id'] );
+if( $stmt->execute() ) { $response = ['success' => true]; }
+
+
 $stmt = $mysqli->prepare("DELETE FROM itemMap WHERE item_id = ?");
 $stmt->bind_param('i', $data['id'] );
 if( $stmt->execute() ) { $response = ['success' => true]; }

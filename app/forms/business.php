@@ -119,15 +119,17 @@ if( $stmt->execute() ) {
 }
 
 // // create new ones
-for($i=0; $i<count($_POST['selected']); $i++) {
+if ( isset($_POST['selected']) && count($_POST['selected']) > 0 ) {
+  for($i=0; $i < count($_POST['selected']); $i++) {
 
-  $stmt = $mysqli->prepare("INSERT INTO busMap (bus_id, item_id) VALUES (?,?)");
-  $stmt->bind_param('ii',$_POST['id'], $_POST['selected'][$i]["id"] );
-  if( $stmt->execute() ) {
-    $response = ['success' => true];
+    $stmt = $mysqli->prepare("INSERT INTO busMap (bus_id, cat_id) VALUES (?,?)");
+    $stmt->bind_param('ii',$_POST['id'], $_POST['selected'][$i]["id"] );
+    if( $stmt->execute() ) {
+      $response = ['success' => true];
+    }
   }
-
 }
+
 
 
 $stmt->close();

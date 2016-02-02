@@ -36,7 +36,7 @@ if ($stmt->execute()) {
 $stmt->fetch();
 $stmt->close();
 
-$stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, items.id as item_id, items.name as item_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN items on busMap.item_id = items.id ORDER BY businesses.id ASC;');
+$stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, categories.id as cat_id, categories.name as cat_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN categories on busMap.cat_id = categories.id ORDER BY businesses.id ASC;');
 if ($stmt->execute()) {
   $result = $stmt->get_result();
   $items = $result->fetch_all(MYSQLI_ASSOC);
@@ -138,7 +138,7 @@ if ($stmt->execute()) {
             echo "</tr><tr class='items-tr'><td class='items-td' colspan='11'>  <div class='items-div'> <ul class='items-" . $b['id']  ."'>";
             // loop
             for($i=0; $i<count($items); $i++) {
-              if ( $items[$i]['bz_id'] == $b['id'] )  echo "<li>  " . $items[$i]['item_name'] . "  </li>";
+              if ( $items[$i]['bz_id'] == $b['id'] )  echo "<li>  " . $items[$i]['cat_name'] . "  </li>";
             }
             echo "</ul> </div> </td></tr>";
           }
@@ -380,7 +380,7 @@ function tokenize() {
      var tag = event.item;
 
      for (var i=0; i<items.length; i++) {
-       if (items[i].name.indexOf(tag) !== -1) {
+       if (items[i].name.toLowerCase().indexOf(tag.toLowerCase()) !== -1) {
          // allow them to add it.
          return true
        }
@@ -442,7 +442,7 @@ $('body').on('click', '.edit', function(e){
   });
 
   $.ajax({
-    url: baseUrl + 'forms/getItems.php',
+    url: baseUrl + 'forms/getCategories.php',
     method: 'GET',
     dataType: 'json',
     success: function(res) {
@@ -517,8 +517,8 @@ $('body').on('click', '#saveBussiness', function(e){
       $(editing.target).parent().parent().find('.longitude').text(data.longitude);
 
       //close modal
-      $('#editModal').modal('hide');
-      $('.modal-backdrop').remove();
+      //$('#editModal').modal('hide');
+      //$('.modal-backdrop').remove();
     },
     error: function(error) {
       console.error('error', error);
