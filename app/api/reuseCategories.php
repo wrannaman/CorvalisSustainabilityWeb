@@ -1,5 +1,18 @@
 <?php
-
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
 // Get to repair categories from businesses
 
 // Create an associative array for storing the (JSON) response
@@ -17,8 +30,8 @@ if ($mysqli->connect_errno) {
 $stmt = $mysqli->prepare( 'SELECT busMap.cat_id, Categories.name as cat_name FROM busMap INNER JOIN businesses on businesses.id = busMap.bus_id INNER JOIN Categories on Categories.id = busMap.cat_id WHERE businesses.type = "reuse"' );
 
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $items = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result( $stmt );
+  // $items = $result->fetch_all(MYSQLI_ASSOC);
 }
 
 function unique_multidim_array($array, $key) {
@@ -36,12 +49,12 @@ function unique_multidim_array($array, $key) {
     return $temp_array;
 }
 
-$items = unique_multidim_array($items, "cat_name");
+$result = unique_multidim_array($result, "cat_name");
 
 $stmt->close();
 $mysqli->close();
 // If we make it this far then we'll simply return a successful response
 http_response_code(200);
 //header('Content-Type: application/json');
-echo json_encode($items);
+echo json_encode($result);
 ?>

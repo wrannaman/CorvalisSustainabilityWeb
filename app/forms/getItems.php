@@ -3,7 +3,20 @@
 // Create an associative array for storing the (JSON) response
 $response = ['errors' => []];
 require_once '../config/db.php';
-
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
 // Create the database connection
 $mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
 if ($mysqli->connect_errno) {
@@ -13,8 +26,8 @@ $stmt = $mysqli->prepare(
   'SELECT* FROM items ORDER BY name ASC;'
 );
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $items = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result($stmt);
+  $items = $result;
 }
 
 $stmt->close();

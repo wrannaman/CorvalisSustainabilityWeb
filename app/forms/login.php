@@ -7,6 +7,20 @@ $data = json_decode(file_get_contents('php://input'), true);
 $pass_is_empty = !isset($data['password']);
 $email_is_empty = !isset($data['email']);
 
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
 
 if ($pass_is_empty || $email_is_empty) {
   if ($pass_is_empty){
@@ -33,8 +47,8 @@ if ($mysqli->connect_errno) { $response['errors'][] = 'Database connection faile
 $stmt = $mysqli->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
 $stmt->bind_param('s', $data['email']);
 if( $stmt->execute() ) {
-  $result = $stmt->get_result();
-  $users = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result( $stmt );
+  $users = $result;
   if (sizeof($users) == 1 && $users[0]["email"] == $data['email']) {
     //check password
     $salt = "alsjdkf230989021sdjklfclsa";

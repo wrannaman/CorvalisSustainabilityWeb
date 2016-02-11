@@ -10,6 +10,21 @@ function getCurrentUri4() {
   return $bodytag;
 }
 
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
+
 if(!isset($_SESSION['user']))      // if there is no valid session
 {
     $location = getCurrentUri4() . "/login.php";
@@ -27,8 +42,8 @@ if ($mysqli->connect_errno) {
 // Get the user's categories &  items
 $stmt = $mysqli->prepare('SELECT* FROM items ORDER BY id ASC;');
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $items = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result( $stmt );
+  $items = $result;
 }
 $stmt->fetch();
 $stmt->close();

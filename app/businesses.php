@@ -9,6 +9,20 @@ function getCurrentUri2() {
   $bodytag = str_replace($uri, "", "http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
   return $bodytag;
 }
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
 
 if(!isset($_SESSION['user']))      // if there is no valid session
 {
@@ -30,16 +44,16 @@ $stmt = $mysqli->prepare(
   'SELECT * FROM businesses ORDER BY id ASC;'
 );
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $businesses = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result($stmt);
+  $businesses = $result;
 }
 $stmt->fetch();
 $stmt->close();
 
 $stmt = $mysqli->prepare('SELECT businesses.id as bz_id, businesses.name as bz_name, categories.id as cat_id, categories.name as cat_name from businesses LEFT OUTER JOIN busMap ON busMap.bus_id = businesses.id LEFT OUTER JOIN categories on busMap.cat_id = categories.id ORDER BY businesses.id ASC;');
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $items = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result($stmt );
+  $items = $result;
 }
 
 

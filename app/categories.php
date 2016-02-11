@@ -10,6 +10,21 @@ function getCurrentUri3() {
   return $bodytag;
 }
 
+function get_result( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+}
+
 if(!isset($_SESSION['user']))      // if there is no valid session
 {
     $location = getCurrentUri3() . "/login.php";
@@ -26,16 +41,16 @@ if ($mysqli->connect_errno) {
 // Get the user's categories &  items
 $stmt = $mysqli->prepare('SELECT* FROM categories ORDER BY id ASC;');
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $businesses = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result($stmt);
+  $businesses = $result;
 }
 $stmt->fetch();
 $stmt->close();
 
 $stmt = $mysqli->prepare('SELECT categories.id as cat_id, categories.name as cat_name, items.id as item_id, items.name as item_name from categories LEFT OUTER JOIN itemMap ON itemMap.category_id = categories.id LEFT OUTER JOIN items on itemMap.item_id = items.id ORDER BY categories.name ASC;');
 if ($stmt->execute()) {
-  $result = $stmt->get_result();
-  $items = $result->fetch_all(MYSQLI_ASSOC);
+  $result = get_result($stmt);
+  $items = $result;
 }
 $stmt->fetch();
 $stmt->close();
