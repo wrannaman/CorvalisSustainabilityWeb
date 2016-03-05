@@ -28,7 +28,7 @@ if ($mysqli->connect_errno) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Corvalis Sustainability App</title>
+<title>Corvallis Sustainability App</title>
 </head>
 
 <body>

@@ -61,7 +61,7 @@ if ($stmt->execute()) {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Corvalis Sustainability App</title>
+  <title>Corvallis Sustainability App</title>
 </head>
 <style>
   .website {
