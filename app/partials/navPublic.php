@@ -25,27 +25,27 @@ $(document).ready(function() {
     $('.categories').removeClass('active');
 	$('.map').removeClass('active');
   }
-  if (window.location.pathname.indexOf('home.php') !== -1 )
+  if (window.location.pathname.indexOf('homePublic.php') !== -1 )
   {
     _reset();
     $('.home').addClass('active');
   }
-  if (window.location.pathname.indexOf('businesses.php') !== -1 )
+  if (window.location.pathname.indexOf('businessesPublic.php') !== -1 )
   {
     _reset();
     $('.business').addClass('active');
   }
-  if (window.location.pathname.indexOf('users.php') !== -1 )
+  if (window.location.pathname.indexOf('usersPublic.php') !== -1 )
   {
     _reset();
     $('.users').addClass('active');
   }
-  if (window.location.pathname.indexOf('categories.php') !== -1 )
+  if (window.location.pathname.indexOf('categoriesPublic.php') !== -1 )
   {
     _reset();
     $('.categories').addClass('active');
   }
-  if (window.location.pathname.indexOf('map.php') !== -1 )
+  if (window.location.pathname.indexOf('mapPublic.php') !== -1 )
   {
     _reset();
     $('.map').addClass('active');
@@ -64,10 +64,10 @@ $(document).ready(function() {
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-		<li class="home"><a href="<?php getCurrentUri() ?>/home.php">Home</a></li>
-        <li class="business"><a href="<?php getCurrentUri() ?>/businesses.php">Businesses</a></li>
-        <li class="categories"><a href="<?php getCurrentUri() ?>/categories.php">Categories</a></li>
-		<li class="map"><a href="<?php getCurrentUri() ?>/map.php">Map</a></li>
+		<li class="home"><a href="<?php getCurrentUri() ?>/homePublic.php">Home</a></li>
+        <li class="business"><a href="<?php getCurrentUri() ?>/businessesPublic.php">Businesses</a></li>
+        <li class="categories"><a href="<?php getCurrentUri() ?>/categoriesPublic.php">Categories</a></li>
+		<li class="map"><a href="<?php getCurrentUri() ?>/mapPublic.php">Map</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
