@@ -33,7 +33,7 @@
 	<body>
 		<?php include 'partials/navPublic.php';?>
 		<div class="container">
-			<img src="Sustainability-Fair.jpg" alt="Corvallis Sustainability Coalition" style="width:650px;height:228px;">
+			<img src="images/Sustainability-Fair.jpg" alt="Corvallis Sustainability Coalition" style="width:650px;height:228px;">
 			<br><br>
 			<h1><b>Corvallis Reuse and Repair Directory</b></h1>
 			<br><br><br>
